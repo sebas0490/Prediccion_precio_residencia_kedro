@@ -31,21 +31,20 @@ def _reemplazar_nulos_por_la_media(df: DataFrame, columnas_numericas) -> DataFra
     return reemplazar_nulos_por_la_media(df, columnas_numericas)
 
 
-def get_data(parameters: Dict[str, Any]) -> Tuple[DataFrame, Steps, List[str]]:
+def get_data(parameters: Dict[str, Any]) -> DataFrame:
     """
     Returns:
-        data, steps, columnas_numericas
+        data_raw
     """
     steps = Steps.build(tempfile.gettempdir() + '/prediccion_precio_residencia_kedro', url=parameters['url'])
-    data: DataFrame = steps.raw_df
-    columnas_numericas = list(set(parameters['columnas_raw']).difference(['date']))
-    return data, steps, columnas_numericas
+    data_raw: DataFrame = steps.raw_df
+    return data_raw
 
 
-def limpieza_calidad(data: DataFrame,
-                     columnas_numericas: List[str],
+def limpieza_calidad(data_raw: DataFrame,
                      parameters: Dict[str, Any]
                      ) -> Tuple[DataFrame, Steps]:
+    columnas_numericas = list(set(parameters['columnas_raw']).difference(['date']))
     li = Pipeline([
         ('convertir_tipos', FunctionTransformer(_convertir_tipos,
                                                 kw_args={'columnas_numericas': columnas_numericas})),
@@ -65,33 +64,41 @@ def limpieza_calidad(data: DataFrame,
                                                      kw_args={'columnas': parameters['columnas_entrada'] + ['price']}))
     ]
     )
-    if 'index' not in data.columns:
-        cant_filas = data.shape[0]
-        data['index'] = np.linspace(1, cant_filas, cant_filas)
-    data_transformada = li.transform(data)
-    return data_transformada
+    if 'index' not in data_raw.columns:
+        cant_filas = data_raw.shape[0]
+        data_raw['index'] = np.linspace(1, cant_filas, cant_filas)
+    data_limpia = li.transform(data_raw)
+    return data_limpia
 
 
-def eliminar_nulos_entrenamiento_validacion(data_transformada: DataFrame) -> Tuple[DataFrame, Steps]:
+def eliminar_nulos_entrenamiento_validacion(
+        data_transformada: DataFrame,
+        parameters: Dict[str, Any]
+) -> DataFrame:
     """
     Returns: data_transformada_validacion
     """
     # Cuando se inicialice en modo entrenamiento o validación se deben eliminar los registros con precios nulos
     #   o por fuera de lo normal de acuerdo con el z-score.
-    pval = Preprocesamiento([], ['price'])
-    data_transformada = pval.fit_transform(data_transformada)
-    return data_transformada
+    if parameters['modo_entrenamiento_validacion']:
+        pval = Preprocesamiento([], ['price'])
+        data_transformada_validacion = pval.fit_transform(data_transformada)
+    else:
+        data_transformada_validacion = data_transformada
+    return data_transformada_validacion
 
 
-def make_dataset(parameters: Dict[str, Any], data: DataFrame) -> Tuple[DataFrame, DataFrame]:
+def make_dataset(parameters: Dict[str, Any],
+                 data_transformada_validacion: DataFrame) -> Tuple[DataFrame, DataFrame]:
     """
     Returns: df_train_test, df_validation
     """
     porcentaje_entrenamiento = parameters['porcentaje_entrenamiento']
     if porcentaje_entrenamiento < 1:
-        df_train_test, df_validation = train_test_split(data, train_size=porcentaje_entrenamiento, random_state=1)
+        df_train_test, df_validation = \
+            train_test_split(data_transformada_validacion, train_size=porcentaje_entrenamiento, random_state=1)
     else:
-        df_train_test = data
-        df_validation = data[[False] * data.shape[0]]
+        df_train_test = data_transformada_validacion
+        df_validation = data_transformada_validacion[[False] * data_transformada_validacion.shape[0]]
 
     return df_train_test, df_validation

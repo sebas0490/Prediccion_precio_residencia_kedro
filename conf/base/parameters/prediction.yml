@@ -1,4 +1,4 @@
-# This is a boilerplate parameters config generated for pipeline 'etl'
+# This is a boilerplate parameters config generated for pipeline 'prediction'
 # using Kedro 0.18.3.
 #
 # Documentation for this file format can be found in "Parameters"

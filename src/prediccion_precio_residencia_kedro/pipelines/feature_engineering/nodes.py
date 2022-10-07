@@ -2,26 +2,35 @@
 This is a boilerplate pipeline 'feature_engineering'
 generated using Kedro 0.18.3
 """
+from typing import Tuple, Dict, Any
 
-from prediccion_precio_residencia_kedro.data.procesamiento_datos import Preprocesamiento, ProcesamientoDatos
+from pandas import DataFrame
 
-
-def build_preprocessing() -> Preprocesamiento:
-    pass
-
-
-def build_processing() -> ProcesamientoDatos:
-    pass
+from prediccion_precio_residencia_kedro.data.procesamiento_datos import ProcesamientoDatos, Preprocesamiento
 
 
-def feature_engineering(df_train_test,
-                        df_validation,
-                        preprocsessing: Preprocesamiento,
-                        processing: ProcesamientoDatos):
+def train_transformers(df_train_test: DataFrame, parameters: Dict[str, Any]):
+    """
+    Returns: processing, preprocessing
+    """
+    processing = ProcesamientoDatos()
+    processing.fit_transform(df_train_test)
+    preprocessing = Preprocesamiento(parameters['columnas_z_score'], [])
+    return processing, preprocessing
+
+
+def feature_engineering(df_train_test: DataFrame,
+                        df_validation: DataFrame,
+                        processing: ProcesamientoDatos,
+                        preprocessing: Preprocesamiento) -> Tuple[DataFrame, DataFrame]:
+    """
+    :return: df_train_test_transformed, df_validation_transformed
+    """
+
     df_train_test_transformed = df_train_test. \
-        pipe(preprocsessing.fit_transform). \
-        pipe(processing.fit_transform)
+        pipe(preprocessing.transform). \
+        pipe(processing.transform)
     df_validation_transformed = df_validation. \
-        pipe(preprocsessing.fit_transform). \
-        pipe(processing.fit_transform)
+        pipe(preprocessing.transform). \
+        pipe(processing.transform)
     return df_train_test_transformed, df_validation_transformed

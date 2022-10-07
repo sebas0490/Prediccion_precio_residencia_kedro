@@ -1,3 +1,30 @@
+url: https://bit.ly/3orsN0U
+
+columnas_raw:
+  - zipcode
+  - index
+  - grade
+  - sqft_basement
+  - view
+  - bathrooms
+  - bedrooms
+  - sqft_above
+  - sqft_living15
+  - lat
+  - waterfront
+  - floors
+  - date
+  - yr_renovated
+  - yr_built
+  - long
+  - jhygtf
+  - sqft_lot
+  - price
+  - condition
+  - wertyj
+  - sqft_lot15
+  - sqft_living
+
 columnas_entrada:
   - zipcode
   - grade
@@ -13,3 +40,31 @@ columnas_entrada:
   - sqft_living
   - fue_renovada
   - antiguedad_venta
+
+X_columns:
+ - zipcode
+ - grade
+ - view
+ - bathrooms
+ - bedrooms
+ - sqft_living15
+ - waterfront
+ - floors
+ - sqft_lot
+ - condition
+ - sqft_lot15
+ - sqft_living
+ - fue_renovada
+ - antiguedad_venta
+
+
+y_column: price
+
+porcentaje_entrenamiento: 0.7
+
+modo_entrenamiento_validacion: True
+
+columnas_z_score:
+  - price
+  - sqft_lot
+  - sqft_lot15

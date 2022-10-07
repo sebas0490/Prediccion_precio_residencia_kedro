@@ -34,4 +34,11 @@ pda:
   backend: pickle
   layer: modelos
 
+score_train_test:
+  type: text.TextDataSet
+  filepath: data/08_reporting/score_train_test.txt
+
+score_validation:
+  type: text.TextDataSet
+  filepath: data/08_reporting/score_validation.txt
 
