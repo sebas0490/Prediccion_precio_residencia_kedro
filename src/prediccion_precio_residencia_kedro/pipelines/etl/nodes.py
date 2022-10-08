@@ -9,6 +9,7 @@ from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
+import mlflow
 
 from prediccion_precio_residencia_kedro.core.steps import Steps
 import tempfile
@@ -38,6 +39,8 @@ def get_data(parameters: Dict[str, Any]) -> DataFrame:
     """
     steps = Steps.build(tempfile.gettempdir() + '/prediccion_precio_residencia_kedro', url=parameters['url'])
     data_raw: DataFrame = steps.raw_df
+    mlflow.set_experiment('prediccion_casas')
+    mlflow.log_param('data_raw_shape', data_raw.shape)
     return data_raw
 
 
@@ -68,6 +71,7 @@ def limpieza_calidad(data_raw: DataFrame,
         cant_filas = data_raw.shape[0]
         data_raw['index'] = np.linspace(1, cant_filas, cant_filas)
     data_limpia = li.transform(data_raw)
+    mlflow.log_param('shape_limpieza_datos', data_limpia.shape)
     return data_limpia
 
 
@@ -85,6 +89,7 @@ def eliminar_nulos_entrenamiento_validacion(
         data_transformada_validacion = pval.fit_transform(data_transformada)
     else:
         data_transformada_validacion = data_transformada
+    mlflow.log_param('shape data eliminar nulos', data_transformada_validacion.shape)
     return data_transformada_validacion
 
 
@@ -100,5 +105,6 @@ def make_dataset(parameters: Dict[str, Any],
     else:
         df_train_test = data_transformada_validacion
         df_validation = data_transformada_validacion[[False] * data_transformada_validacion.shape[0]]
-
+    mlflow.log_param('df_train_test_shape', df_train_test.shape)
+    mlflow.log_param('df_validation_shape', df_validation.shape)
     return df_train_test, df_validation
