@@ -58,6 +58,15 @@ X_columns:
  - antiguedad_venta
 
 
+categorical_cols:
+  - zipcode
+  - grade
+  - view
+  - waterfront
+  - condition
+  - fue_renovada
+
+
 y_column: price
 
 porcentaje_entrenamiento: 0.7

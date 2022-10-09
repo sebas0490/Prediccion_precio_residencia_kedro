@@ -14,11 +14,13 @@ def create_pipeline(**kwargs) -> Pipeline:
         node(
             func=train_transformers,
             inputs=['df_train_test', 'parameters'],
-            outputs=['processing', 'preprocessing']
+            outputs=['processing', 'preprocessing'],
+            tags='Data transformation'
         ),
         node(
             func=feature_engineering,
             inputs=['df_train_test', 'df_validation', 'processing', 'preprocessing'],
-            outputs=['df_train_test_transformed', 'df_validation_transformed']
+            outputs=['df_train_test_transformed', 'df_validation_transformed'],
+            tags='Data transformation'
         )
     ])

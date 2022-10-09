@@ -2,12 +2,13 @@
 This is a boilerplate pipeline 'training'
 generated using Kedro 0.18.3
 """
-from typing import Tuple, Dict, Any
+from typing import Dict, Any
 
-from kedro.pipeline import Pipeline
 from pandas import DataFrame
 
 from prediccion_precio_residencia_kedro.models.modelo import Modelo
+
+import mlflow
 
 
 def train_model(
@@ -16,4 +17,5 @@ def train_model(
 ) -> Modelo:
     modelo = Modelo()
     modelo.fit(df_train_test_transformed[parameters['X_columns']], df_train_test_transformed[parameters['y_column']])
+    mlflow.set_tag("mlflow.runName", modelo.__class__.__name__)
     return modelo

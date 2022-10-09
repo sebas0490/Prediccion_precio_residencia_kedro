@@ -2,22 +2,27 @@
 This is a boilerplate pipeline 'data_processing'
 generated using Kedro 0.18.3
 """
-from typing import Tuple, Dict, Any, List
+import logging
+import tempfile
+from typing import Tuple, Dict, Any
 
+import mlflow
 import numpy as np
+import pandas as pd
+from deepchecks import Dataset
+from deepchecks.tabular.suites import data_integrity
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
-import mlflow
 
 from prediccion_precio_residencia_kedro.core.steps import Steps
-import tempfile
-
 from prediccion_precio_residencia_kedro.data.funciones_base import convertir_tipos, reemplazar_valores_extremos, \
     reemplazar_nulos_por_la_media, eliminar_duplicados, convertir_col_date_a_date, reemplazar_fechas_nulas, \
     reemplazar_ceros_por_nulos, calculo_variables_adicionales, validar_index_duplicados, seleccionar_columnas
 from prediccion_precio_residencia_kedro.data.procesamiento_datos import Preprocesamiento
+
+logger = logging.getLogger(__name__)
 
 
 def _convertir_tipos(df: DataFrame, columnas_numericas) -> DataFrame:
@@ -108,3 +113,26 @@ def make_dataset(parameters: Dict[str, Any],
     mlflow.log_param('df_train_test_shape', df_train_test.shape)
     mlflow.log_param('df_validation_shape', df_validation.shape)
     return df_train_test, df_validation
+
+
+def data_integrity_validation(data: pd.DataFrame,
+                              parameters: Dict) -> pd.DataFrame:
+    categorical_features = parameters['categorical_cols']
+    label = parameters['y_column']
+
+    dataset = Dataset(data,
+                      label=label,
+                      cat_features=categorical_features)
+    mlflow.set_experiment('prediccion_casas')
+    mlflow.log_param('X_columns', parameters['X_columns'])
+    # Run Suite:
+    integ_suite = data_integrity()
+    suite_result = integ_suite.run(dataset)
+    mlflow.log_param(f"data integrity validation", str(suite_result.passed()))
+    if not suite_result.passed():
+        # save report in data/08_reporting
+        suite_result.save_as_html('data/08_reporting/data_integrity_check.html')
+        mlflow.log_artifact('data/08_reporting/data_integrity_check.html', 'deepchecks')
+        logger.error("data integrity not pass validation tests")
+        # raise Exception("data integrity not pass validation tests")
+    return data

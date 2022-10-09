@@ -13,6 +13,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         node(
             func=train_model,
             inputs=['df_train_test_transformed', 'parameters'],
-            outputs='trained_model'
+            outputs='trained_model',
+            tags='Model training'
         )
     ])
