@@ -1,5 +1,25 @@
 # prediccion_Precio_residencia_kedro
 
+## Instalation guide
+
+1. Clone this repository and create a new python environment.
+2. Activate the new environment in the command line.
+3. Run the follow command
+
+
+-----------------------
+    pip install -e .
+    
+## Commands
+----------------------
+    kedro run
+    
+----------------------   
+    kedro viz  
+    
+----------------------
+    mlflow ui
+
 ## Overview
 
 This is your new Kedro project, which was generated using `Kedro 0.18.3`.
