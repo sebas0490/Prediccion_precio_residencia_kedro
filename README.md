@@ -7,10 +7,10 @@
 3. Run the follow command
 
 
------------------------
-    pip install -e .
+    pip install -r src/requirements.txt
     
 ## Commands
+
 ----------------------
     kedro run
     

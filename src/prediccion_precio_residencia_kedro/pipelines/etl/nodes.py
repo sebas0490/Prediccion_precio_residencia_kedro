@@ -44,10 +44,10 @@ def get_data(parameters: Dict[str, Any]) -> DataFrame:
     Returns:
         data_raw
     """
-    folder_path = tempfile.gettempdir() + '/prediccion_precio_residencia_kedro'
+    folder_path = 'cache'
     url = parameters['url']
     du = DataUtils(
-        Path(folder_path + r'\data'),
+        Path(folder_path + r'\data').resolve().absolute(),
         'kc_house_dataDS.parquet',
         'price',
         load_data=lambda path: pd.read_parquet(path),

@@ -161,4 +161,6 @@ class DataAccess:
 
             print(f'DataAccess - Moviendo archivo transformado a {path_input}')
             path_to_processed_file.replace(path_input)
+        else:
+            print(f'DataAccess - Abriendo dataset en {self._du.input_file_path}')
         return self._load_raw_df(self._du.input_file_path)
