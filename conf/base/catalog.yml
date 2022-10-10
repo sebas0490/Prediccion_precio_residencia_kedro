@@ -1,0 +1,44 @@
+# Here you can define all your data sets by using simple YAML syntax.
+#
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://kedro.readthedocs.io/en/stable/data/data_catalog.html
+kc_house_dataDS:
+  type: pandas.ParquetDataSet
+  filepath: data/01_raw/kc_house_dataDS.parquet
+  layer: source
+
+kc_house_dataDSPredict:
+  type: pandas.ParquetDataSet
+  filepath: data/07_model_output/kc_house_dataDSPredict.parquet
+  layer: prediccion
+
+df_train_test:
+  type: pandas.ParquetDataSet
+  filepath: data/02_intermediate/df_train_test.parquet
+  layer: training
+
+df_validation:
+  type: pandas.ParquetDataSet
+  filepath: data/02_intermediate/df_validation.parquet
+  layer: training
+
+model:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/model.pkl
+  backend: pickle
+  layer: modelos
+
+pda:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/pda.pkl
+  backend: pickle
+  layer: modelos
+
+score_train_test:
+  type: text.TextDataSet
+  filepath: data/08_reporting/score_train_test.txt
+
+score_validation:
+  type: text.TextDataSet
+  filepath: data/08_reporting/score_validation.txt
+

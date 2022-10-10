@@ -1,0 +1,17 @@
+[tool.kedro]
+package_name = "prediccion_precio_residencia_kedro"
+project_name = "prediccion_Precio_residencia_kedro"
+project_version = "0.18.3"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = """
+--cov-report term-missing \
+--cov src/prediccion_precio_residencia_kedro -ra"""
+
+[tool.coverage.report]
+fail_under = 0
+show_missing = true
+exclude_lines = ["pragma: no cover", "raise NotImplementedError"]

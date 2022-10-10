@@ -1,0 +1,97 @@
+url: https://bit.ly/3orsN0U
+
+columnas_raw:
+  - zipcode
+  - index
+  - grade
+  - sqft_basement
+  - view
+  - bathrooms
+  - bedrooms
+  - sqft_above
+  - sqft_living15
+  - lat
+  - waterfront
+  - floors
+  - date
+  - yr_renovated
+  - yr_built
+  - long
+  - jhygtf
+  - sqft_lot
+  - price
+  - condition
+  - wertyj
+  - sqft_lot15
+  - sqft_living
+
+columnas_mediana_recortada_impute:
+  - bedrooms
+  - bathrooms
+  - sqft_living
+  - sqft_lot
+  - floors
+  - waterfront
+  - view
+  - grade
+  - sqft_living15
+  - zipcode
+  - sqft_lot15
+  - condition
+  - bathrooms
+  - bedrooms
+  - antiguedad_venta
+
+
+columnas_entrada:
+  - zipcode
+  - grade
+  - view
+  - bathrooms
+  - bedrooms
+  - sqft_living15
+  - waterfront
+  - floors
+  - sqft_lot
+  - condition
+  - sqft_lot15
+  - sqft_living
+  - fue_renovada
+  - antiguedad_venta
+
+X_columns:
+ - zipcode
+ - grade
+ - view
+ - bathrooms
+ - bedrooms
+ - sqft_living15
+ - waterfront
+ - floors
+ - sqft_lot
+ - condition
+ - sqft_lot15
+ - sqft_living
+ - fue_renovada
+ - antiguedad_venta
+
+
+categorical_cols:
+  - zipcode
+  - grade
+  - view
+  - waterfront
+  - condition
+  - fue_renovada
+
+
+y_column: price
+
+porcentaje_entrenamiento: 0.7
+
+modo_entrenamiento_validacion: True
+
+columnas_z_score:
+  - price
+  - sqft_lot
+  - sqft_lot15
