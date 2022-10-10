@@ -6,7 +6,7 @@
 2. Activate the new environment in the command line.
 3. Run the follow command
 
-
+----------------------
     pip install -r src/requirements.txt
     
 ## Commands
