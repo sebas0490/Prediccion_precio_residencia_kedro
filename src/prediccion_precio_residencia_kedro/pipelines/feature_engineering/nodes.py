@@ -13,9 +13,9 @@ def train_transformers(df_train_test: DataFrame, parameters: Dict[str, Any]):
     """
     Returns: processing, preprocessing
     """
-    processing = ProcesamientoDatos()
+    processing = ProcesamientoDatos(parameters['columnas_mediana_recortada_impute'], parameters['columnas_entrada'])
     processing.fit_transform(df_train_test)
-    preprocessing = Preprocesamiento(parameters['columnas_z_score'], [])
+    preprocessing = Preprocesamiento(parameters['columnas_z_score'], [], parameters['columnas_entrada'])
     return processing, preprocessing
 
 

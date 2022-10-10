@@ -32,6 +32,7 @@ def validar_duplicados(df: DataFrame):
 def eliminar_duplicados(df: DataFrame):
     # Eliminando duplicados
     # print(f'Antes de la eliminación de duplicados, el conjunto de datos tiene {df.shape[0]} filas.')
+    df = pd.DataFrame(df)
     df = df.drop_duplicates(keep='first')
     filas = df.shape[0]
     # print(f'Después de la eliminación de duplicados, el conjunto de datos queda con {filas} filas.')

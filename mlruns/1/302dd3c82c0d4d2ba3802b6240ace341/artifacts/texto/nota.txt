@@ -1,0 +1,1 @@
+Después de validar el reporte de integridad de datos, se encontraron datos altamente correlacionados que no se habían identificado en la exploración (sqft_lot y sqft_lot15),  en esta ejecución se eliminó sqft_lot15.

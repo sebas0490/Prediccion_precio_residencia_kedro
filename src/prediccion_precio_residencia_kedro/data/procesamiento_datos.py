@@ -7,12 +7,13 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 
-from prediccion_precio_residencia_kedro.core.variables_globales import columnas_entrada
-from prediccion_precio_residencia_kedro.data.funciones_base import convertir_tipos, eliminar_duplicados, convertir_col_date_a_date, \
+from prediccion_precio_residencia_kedro.data.funciones_base import convertir_tipos, eliminar_duplicados, \
+    convertir_col_date_a_date, \
     reemplazar_valores_extremos, reemplazar_nulos_por_la_media, reemplazar_fechas_nulas, reemplazar_ceros_por_nulos, \
     validar_index_duplicados, calcular_mediana_recortada, mediana_recortada_imputacion, validar_datos_nulos, \
     clasificar_columnas, seleccionar_columnas, calculo_variables_adicionales
-from prediccion_precio_residencia_kedro.features.limpiezaDatos1 import eliminacionOutliers, eliminacion_outliers_custom_function
+from prediccion_precio_residencia_kedro.features.limpiezaDatos1 import eliminacionOutliers, \
+    eliminacion_outliers_custom_function
 
 
 def outlier_nan(column: str) -> Callable[[DataFrame], pd.Series]:
@@ -30,17 +31,19 @@ def outlier_bedrooms(X: DataFrame) -> pd.Series:
     return (X['bedrooms'] == 0) | (X['bedrooms'] > 5) | (X['bedrooms'].isna())
 
 
-isoutliers_definitions = {
-    **{column: outlier_nan(column) for column in columnas_entrada + ['price']},
-    'bathrooms': outlier_bathrooms,
-    'bedrooms': outlier_bedrooms
-}
+def isoutliers_definitions(columnas_entrada):
+    return {
+        **{column: outlier_nan(column) for column in columnas_entrada + ['price']},
+        'bathrooms': outlier_bathrooms,
+        'bedrooms': outlier_bedrooms
+           }
 
 
 class LimpiezaCalidad(BaseEstimator, TransformerMixin):
-    def __init__(self, columnas_numericas: List[str]):
+    def __init__(self, columnas_numericas: List[str], columnas_entrada):
         self._pipeline: Union[None, Pipeline] = None
         self.columnas_numericas: List[str] = columnas_numericas
+        self.columnas_entrada = columnas_entrada
 
     @property
     def pipeline(self) -> Pipeline:
@@ -58,7 +61,7 @@ class LimpiezaCalidad(BaseEstimator, TransformerMixin):
                 ('validar_indices_duplicados', FunctionTransformer(validar_index_duplicados,
                                                                    kw_args={'is_duplicated_ok': False})),
                 ('seleccionar_columnas', FunctionTransformer(seleccionar_columnas,
-                                                             kw_args={'columnas': columnas_entrada + ['price']}))
+                                                             kw_args={'columnas': self.columnas_entrada + ['price']}))
             ]
             )
         return self._pipeline
@@ -85,10 +88,11 @@ class Preprocesamiento(BaseEstimator, TransformerMixin):
     realiza para los datos de validación o predicción.
     """
 
-    def __init__(self, columnas_z_score, columnas_drop_na):
+    def __init__(self, columnas_z_score, columnas_drop_na, columnas_entrada):
         self._pipeline: Union[None, Pipeline] = None
         self.columnas_z_score = columnas_z_score
         self.columnas_drop_na = columnas_drop_na
+        self.columnas_entrada = columnas_entrada
 
     @staticmethod
     def outlier_bathrooms(X: DataFrame) -> pd.Series:
@@ -110,7 +114,8 @@ class Preprocesamiento(BaseEstimator, TransformerMixin):
         return self._pipeline
 
     def _eliminacion_outliers_custom_function(self, df):
-        return eliminacion_outliers_custom_function(df, self.columnas_drop_na, isoutliers_definitions)
+        return eliminacion_outliers_custom_function(df, self.columnas_drop_na,
+                                                    isoutliers_definitions(self.columnas_entrada))
 
     def fit(self, X: DataFrame, y: DataFrame = None):
         return self.pipeline.fit(X)
@@ -120,14 +125,12 @@ class Preprocesamiento(BaseEstimator, TransformerMixin):
 
 
 class ProcesamientoDatos(BaseEstimator, TransformerMixin):
-    def __init__(self):
+    def __init__(self, columnas_mediana_recortada_impute, columnas_entrada):
         self._pipeline: Union[None, Pipeline] = None
         self._medianas_recortadas = None
-        self._columnas_mediana_recortada_impute = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors',
-                                                   'waterfront', 'view', 'grade', 'sqft_living15', 'zipcode',
-                                                   'sqft_lot15', 'condition', 'bathrooms', 'bedrooms',
-                                                   'antiguedad_venta']
+        self._columnas_mediana_recortada_impute = columnas_mediana_recortada_impute
         self._is_fitted = False
+        self.columnas_entrada = columnas_entrada
 
         self._clasificacion_columnas = {
             'categorica_ordinal': ['zipcode', 'grade', 'view', 'waterfront', 'condition', 'lat', 'long'],
@@ -148,13 +151,15 @@ class ProcesamientoDatos(BaseEstimator, TransformerMixin):
             self._pipeline = Pipeline([
                 ('imputar_nulos_mediana', FunctionTransformer(self._mediana_recortada_imputacion)),
                 ('validar nulos', FunctionTransformer(validar_datos_nulos)),
-                ('conversion_tipos', FunctionTransformer(self._clasificar_columnas))
+                ('conversion_tipos', FunctionTransformer(self._clasificar_columnas)),
+                ('eliminar_duplicados', FunctionTransformer(eliminar_duplicados))
             ]
             )
         return self._pipeline
 
     def _mediana_recortada_imputacion(self, df: DataFrame) -> DataFrame:
-        return mediana_recortada_imputacion(df, self._columnas_mediana_recortada_impute, isoutliers_definitions,
+        return mediana_recortada_imputacion(df, self._columnas_mediana_recortada_impute,
+                                            isoutliers_definitions(self.columnas_entrada),
                                             self._medianas_recortadas)
 
     def _clasificar_columnas(self, df: DataFrame) -> DataFrame:
@@ -163,8 +168,9 @@ class ProcesamientoDatos(BaseEstimator, TransformerMixin):
     def fit(self, X: DataFrame, y: DataFrame = None):
         self._medianas_recortadas = {}
         for column in self._columnas_mediana_recortada_impute:
-            self._medianas_recortadas[column] = calcular_mediana_recortada(X, column,
-                                                                           isoutliers_definitions[column](X))
+            self._medianas_recortadas[column] = \
+                calcular_mediana_recortada(X, column,
+                                           isoutliers_definitions(self.columnas_entrada)[column](X))
         fitted = self.pipeline.fit(X)
         self._is_fitted = True
         return fitted

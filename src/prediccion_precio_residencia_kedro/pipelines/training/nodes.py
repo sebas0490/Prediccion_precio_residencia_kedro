@@ -15,7 +15,7 @@ def train_model(
         df_train_test_transformed: DataFrame,
         parameters: Dict[str, Any]
 ) -> Modelo:
-    modelo = Modelo()
+    modelo = Modelo(parameters['columnas_entrada'])
     modelo.fit(df_train_test_transformed[parameters['X_columns']], df_train_test_transformed[parameters['y_column']])
     mlflow.set_tag("mlflow.runName", modelo.__class__.__name__)
     return modelo

@@ -25,6 +25,24 @@ columnas_raw:
   - sqft_lot15
   - sqft_living
 
+columnas_mediana_recortada_impute:
+  - bedrooms
+  - bathrooms
+  - sqft_living
+  - sqft_lot
+  - floors
+  - waterfront
+  - view
+  - grade
+  - sqft_living15
+  - zipcode
+  - sqft_lot15
+  - condition
+  - bathrooms
+  - bedrooms
+  - antiguedad_venta
+
+
 columnas_entrada:
   - zipcode
   - grade

@@ -8,10 +8,11 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 
 class Modelo(BaseEstimator, RegressorMixin):
-    def __init__(self):
+    def __init__(self, columnas_entrada):
         super(Modelo, self).__init__()
         self._pipeline: Union[None, Pipeline] = None
         self._is_fitted = False
+        self.columnas_entrada = columnas_entrada
 
     def __sklearn_is_fitted__(self):
         return self._is_fitted
@@ -21,10 +22,7 @@ class Modelo(BaseEstimator, RegressorMixin):
         if self._pipeline is None:
             self._pipeline = make_pipeline(
                 make_column_transformer(
-                    ('passthrough', [
-                        'zipcode', 'grade', 'view', 'bathrooms', 'bedrooms', 'sqft_living15', 'waterfront', 'floors',
-                        'sqft_lot', 'condition', 'sqft_lot15', 'sqft_living', 'fue_renovada', 'antiguedad_venta'
-                    ])
+                    ('passthrough', self.columnas_entrada)
                 ),
                 StandardScaler(),
                 PolynomialFeatures(degree=2, interaction_only=False),

@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Users/jevo1/Documents/Python%20Scripts/Prediccion_precio_residencia_kedro/mlruns/1/a81c38a4135e47b8aa4d965ce2112f71/artifacts
+deleted_time: 1665408386598
+end_time: 1665405459275
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: deleted
+name: ''
+run_id: a81c38a4135e47b8aa4d965ce2112f71
+run_uuid: a81c38a4135e47b8aa4d965ce2112f71
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1665405402038
+status: 3
+tags: []
+user_id: jevo1

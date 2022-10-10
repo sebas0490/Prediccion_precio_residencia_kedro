@@ -2,6 +2,7 @@
 This is a boilerplate pipeline 'evaluation'
 generated using Kedro 0.18.3
 """
+from pathlib import Path
 from typing import Dict, Any
 
 import mlflow
@@ -42,5 +43,9 @@ def model_evaluation_check(
     mlflow.log_param(f"model evaluation validation", str(suite_result.passed()))
     if not suite_result.passed():
         # save report in data/08_reporting
-        suite_result.save_as_html('data/08_reporting/model_eval_check.html')
+        ruta = Path('data/08_reporting/model_eval_check.html')
+        ruta.unlink(missing_ok=True)
+        suite_result.save_as_html(str(ruta))
+        mlflow.log_artifact(str(ruta), 'deepchecks')
+        ruta.unlink(missing_ok=True)
         print("model not pass evaluation tests")
