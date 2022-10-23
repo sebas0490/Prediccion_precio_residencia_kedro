@@ -151,11 +151,11 @@ def data_integrity_validation(data: pd.DataFrame,
     mlflow.log_param(f"data integrity validation", str(suite_result.passed()))
     if not suite_result.passed():
         # save report in data/08_reporting
-        mlflow.log_text('Se corre el modelo quitando los duplicados exactos', 'texto/nota2.txt')
+        # mlflow.log_text('Se corre el modelo quitando los duplicados exactos', 'texto/nota2.txt')
         ruta = Path('data/08_reporting/data_integrity_check.html')
         ruta.unlink(missing_ok=True)
         suite_result.save_as_html(str(ruta))
-        mlflow.log_artifact(str(ruta), 'deepchecks')
+        # mlflow.log_artifact(str(ruta), 'deepchecks')
         ruta.unlink(missing_ok=True)
         logger.error("data integrity not pass validation tests")
         # raise Exception("data integrity not pass validation tests")

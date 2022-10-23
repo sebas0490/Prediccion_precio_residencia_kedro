@@ -46,6 +46,6 @@ def model_evaluation_check(
         ruta = Path('data/08_reporting/model_eval_check.html')
         ruta.unlink(missing_ok=True)
         suite_result.save_as_html(str(ruta))
-        mlflow.log_artifact(str(ruta), 'deepchecks')
+        # mlflow.log_artifact(str(ruta), 'deepchecks')
         ruta.unlink(missing_ok=True)
         print("model not pass evaluation tests")
